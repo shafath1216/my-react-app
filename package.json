@@ -1,8 +1,8 @@
 {
-  "name": "dipti-aws-react-demo",
+  "name": "my-react-gh-pages",
   "version": "0.1.0",
   "private": true,
-  "homepage": "http://dipti-aws-react-demo.s3-website-ap-southeast-2.amazonaws.com",
+  "homepage": "https://smukhiasif.github.io/react-gh-pages/",
   "dependencies": {
     "@testing-library/dom": "^10.4.0",
     "@testing-library/jest-dom": "^6.6.3",
