@@ -56,11 +56,11 @@ jobs:
         aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
         aws-region: ${{ secrets.AWS_REGION }}
 
-    - name: Download build artifact
-      uses: actions/download-artifact@v4
-      with:
-         name: build
-         path: .
+    # - name: Download build artifact
+    #   uses: actions/download-artifact@v4
+    #   with:
+    #      name: build
+    #      path: .
 
     - name: Deploy to S3
       id: deployment
