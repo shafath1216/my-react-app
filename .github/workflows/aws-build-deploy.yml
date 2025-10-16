@@ -1,5 +1,6 @@
 name: Deploy React App to AWS S3
 
+
 on:
   workflow_dispatch:
   push:
@@ -10,6 +11,7 @@ env:
   AWS_REGION: us-east-1
   S3_BUCKET: dipti-aws-react-demo
 
+
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -17,14 +19,11 @@ jobs:
       matrix:
         node-version: [18]
 
-    outputs:
-      build_dir: ${{ steps.set-build-dir.outputs.build_dir }}
-
     steps:
-      - name: Checkout repository
+      - name: Checkout Repository
         uses: actions/checkout@v4
         with:
-          persist-credentials: false
+          persist-credentials: false  # Important
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
@@ -32,92 +31,38 @@ jobs:
           node-version: 18
           cache: 'npm'
 
-      - name: Install dependencies
+      - name: Install Dependencies
         run: npm ci
 
       - name: Build React App
         run: npm run build
 
-      - name: List workspace for debug
-        run: |
-          echo "Workspace contents:"
-          ls -la
-
-      - name: Detect build output directory
-        id: set-build-dir
-        run: |
-          # Detect common build output directories
-          if [ -d build ]; then
-            echo "Detected build/ directory"
-            echo "build_dir=build" >> $GITHUB_OUTPUT
-          elif [ -d dist ]; then
-            echo "Detected dist/ directory"
-            echo "build_dir=dist" >> $GITHUB_OUTPUT
-          else
-            echo "No build output directory found (checked build/ and dist/)"
-            echo "build_dir=" >> $GITHUB_OUTPUT
-          fi
-
-      - name: Fail if no build output
-        if: steps.set-build-dir.outputs.build_dir == ''
-        run: |
-          echo "ERROR: Build output directory not found."
-          echo "Run 'npm run build' locally and verify a 'build/' or 'dist/' folder is created."
-          exit 1
-
-      - name: Upload build artifact
-        if: steps.set-build-dir.outputs.build_dir != ''
-        uses: actions/upload-artifact@v4
-        with:
-          name: aws-react-app
-          path: ${{ steps.set-build-dir.outputs.build_dir }}
-
+      - name: Upload Artifacts
+        uses: actions/upload-pages-artifact@v3
+        with: 
+          name: 'aws-react-app'
+          path: build
   deploy:
-    needs: build
-    runs-on: ubuntu-latest
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
-
+    runs-on: ubuntu-latest
+    needs: build
     steps:
-      - name: Configure AWS credentials
-        uses: aws-actions/configure-aws-credentials@v4
-        with:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: ${{ env.AWS_REGION }}
+    - name: Configure AWS credentials
+      uses: aws-actions/configure-aws-credentials@v4
+      with:
+        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        aws-region: ${{ secrets.AWS_REGION }}
 
-      - name: Download build artifact
-        uses: actions/download-artifact@v4
-        with:
-          name: aws-react-app
-          path: artifact
+    - name: Download build artifact
+      uses: actions/download-artifact@v4
+      with:
+         name: build
+         path: artifact/build
 
-      - name: Show downloaded artifact contents (debug)
-        run: |
-          echo "Listing artifact directory:"
-          ls -la artifact || true
-          echo "Selected build dir from build job: ${{ needs.build.outputs.build_dir }}"
-
-      - name: Deploy to S3
-        id: deployment
-        run: |
-          BUILD_DIR="${{ needs.build.outputs.build_dir }}"
-          if [ -z "$BUILD_DIR" ]; then
-            echo "ERROR: build directory not provided by build job"
-            exit 1
-          fi
-
-          SOURCE_PATH="artifact/$BUILD_DIR/"
-          if [ ! -d "$SOURCE_PATH" ]; then
-            echo "ERROR: Source path $SOURCE_PATH does not exist"
-            ls -la artifact || true
-            exit 1
-          fi
-
-          echo "Syncing $SOURCE_PATH to s3://${{ env.S3_BUCKET }}"
-          aws s3 sync "$SOURCE_PATH" "s3://${{ env.S3_BUCKET }}" --delete
-
-          # Optionally construct a page URL if you host via website endpoint
-          # echo "::set-output name=page_url::https://$S3_BUCKET.s3.amazonaws.com/index.html"
-          echo "Deployment to S3 completed."
+    - name: Deploy to S3
+      id: deployment
+      run: |
+        aws s3 sync ./build/ s3://${{ secrets.S3_BUCKET_NAME }} --delete
