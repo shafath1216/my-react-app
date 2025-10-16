@@ -7,7 +7,7 @@ function App() {
       <header className="App-header">
         <img src={logo} className="App-logo" alt="logo" />
         <p>
-          Welcome to Github Action! Learn with DIPTI Batch 6.8!
+          Welcome to Github Action! AWS S3 Bucket Deployment!
         </p>
         <a
           className="App-link"
