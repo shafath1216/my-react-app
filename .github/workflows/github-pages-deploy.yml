@@ -3,8 +3,8 @@ name: Deploy React App to GitHub Pages
 
 on:
   workflow_dispatch:
-  push:
-    branches:
+  #push:
+   # branches:
       - main
 
 permissions:

@@ -2,12 +2,12 @@ name: Deploy React App to AWS S3
 
 on:
   workflow_dispatch:
-  #push:
-   # branches: main
+  push:
+    branches: main
 
 env:
   AWS_REGION: us-east-1
-  S3_BUCKET: dipti-aws-react-demo
+  S3_BUCKET: github-react-deploy-bucket 
 
 jobs:
   build:
