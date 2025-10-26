@@ -7,7 +7,7 @@ function App() {
       <header className="App-header">
         <img src={logo} className="App-logo" alt="logo" />
         <p>
-          Welcome to Github Action! Github pages test again!
+          Welcome to Github Action! aws deploy !
         </p>
         <a
           className="App-link"
