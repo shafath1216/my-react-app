@@ -2,7 +2,7 @@
   "name": "dipti-aws-react-demo",
   "version": "0.1.0",
   "private": true,
-  "homepage": "https://shafath1216.github.io/react-gh-pages/",
+  "homepage": "http://github-react-deploy-bucket.s3-website-us-east-1.amazonaws.com/",
   "dependencies": {
     "@testing-library/dom": "^10.4.0",
     "@testing-library/jest-dom": "^6.6.3",
